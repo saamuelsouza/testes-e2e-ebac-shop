@@ -1,5 +1,6 @@
 /// <reference types="cypress" />
 import {faker} from '@faker-js/faker';
+import produtosPage from '../support/page_objects/produtos.page';
 
 context('Exercicio - Testes End-to-end - Fluxo de pedido', () => {
     /*  Como cliente 
@@ -19,22 +20,33 @@ context('Exercicio - Testes End-to-end - Fluxo de pedido', () => {
         var nome = faker.person.firstName()
         var sobrenome = faker.person.lastName()
         var email = faker.internet.email(nome)
-        // Deve visitar a página de produtos Ebac Shop e clicar no produto desejado
-        cy.visit('produtos')
-        cy.get('.product-block')
-             .first()
-             .click()
+    
+        it('Login com sucesso usando Comando customizado', () => {
+            cy.visit('minha-conta')
+            cy.login(dadosLogin.usuario, dadosLogin.senha)
+            cy.get('.page-title').should('contain', 'Minha conta')
+        });
+        
+        // Deve visitar a página de produtos Ebac Shop
+        produtosPage.visitarUrl('')
+    
+        ///Deve buscar um produto com sucesso
+        produtosPage.buscarProduto('Abominable Hoodie')
+
         // Deve selecionar tamanho, cor e a quantidade desejada do produto escolhido
-        cy.get('.button-variable-item-L').click()
+        cy.get('.button-variable-item-XS').click()
         cy.get('.button-variable-item-Red').click()
         cy.get('.input-text').clear().type(quantidade)
+
         // Deve adicionar os produtos ao carrinho de compras da loja e validar se os itens foram adicionados ao carrinho corretamente
         cy.get('.single_add_to_cart_button').click()
         cy.get('.dropdown-toggle > .mini-cart-items').should('contain', quantidade)
         cy.get('.woocommerce-message').should('contain', quantidade + ' × “Abominable Hoodie” foram adicionados no seu carrinho.')
+
         // Deve Visitar o carrinho de compras e avançar para a página de Checkout
         cy.get('.woocommerce-message > .button').click()
         cy.get('.checkout-button').click()
+
         //Deve preencher todos os campos com os dados cadastrais da Página de Checkout da Ebac Shop
         cy.get('#billing_first_name').type(nome)
         cy.get('#billing_last_name').type(sobrenome)
